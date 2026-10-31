@@ -18,15 +18,7 @@ data "aws_vpc" "default" {
   default = true
 }
 
-# Default subnet
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
-# Amazon Linux 2023 AMI
+# Amazon Linux 2023
 data "aws_ami" "amazon_linux" {
   most_recent = true
 
@@ -38,7 +30,6 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
-# Security Group
 resource "aws_security_group" "kafka_sg" {
 
   name        = "kafka-project-sg"
@@ -56,7 +47,7 @@ resource "aws_security_group" "kafka_sg" {
   }
 
   ingress {
-    description = "Kafka Broker"
+    description = "Kafka"
 
     from_port   = 9092
     to_port     = 9092
@@ -76,6 +67,7 @@ resource "aws_security_group" "kafka_sg" {
   }
 
   egress {
+
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -88,23 +80,17 @@ resource "aws_security_group" "kafka_sg" {
   }
 }
 
-# EC2 Instance
 resource "aws_instance" "kafka_server" {
 
   ami           = data.aws_ami.amazon_linux.id
   instance_type = var.instance_type
   key_name      = var.key_name
 
-  subnet_id                   = data.aws_subnets.default.ids[0]
-  associate_public_ip_address = true
-
   vpc_security_group_ids = [
     aws_security_group.kafka_sg.id
   ]
 
-  user_data = templatefile("${path.module}/userdata.sh", {
-    github_repo = var.github_repo
-  })
+  user_data = file("${path.module}/userdata.sh")
 
   root_block_device {
     volume_size = 20
