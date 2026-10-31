@@ -82,3 +82,4 @@ resource "aws_instance" "kafka_server" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type
   key_name               = kafka-project-key
+}
