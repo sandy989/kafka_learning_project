@@ -15,7 +15,3 @@ variable "key_name" {
   type        = string
 }
 
-variable "github_repo" {
-  description = "GitHub Repository URL"
-  type        = string
-}

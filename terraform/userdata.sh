@@ -1,26 +1,31 @@
 #!/bin/bash
 
-set -e
+set -eux
 
 dnf update -y
-
-dnf install git docker -y
+dnf install -y git docker
 
 systemctl enable docker
 systemctl start docker
 
-usermod -aG docker ec2-user
+mkdir -p /usr/local/lib/docker/cli-plugins
 
-dnf install docker-compose-plugin -y
+curl -L \
+https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+-o /usr/local/lib/docker/cli-plugins/docker-compose
+
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+curl -L \
+https://github.com/docker/buildx/releases/latest/download/buildx-linux-amd64 \
+-o /usr/local/lib/docker/cli-plugins/docker-buildx
+
+chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 cd /home/ec2-user
 
-git clone ${github_repo}
+git clone https://github.com/sandy989/kafka_learning_project.git
 
-REPO_NAME=$(basename ${github_repo} .git)
-
-cd ${REPO_NAME}
+cd kafka_learning_project
 
 docker compose up -d --build
-
-docker ps
