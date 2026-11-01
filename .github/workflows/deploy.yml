@@ -40,10 +40,8 @@ jobs:
         run: |
           terraform plan \
           -var="key_name=${{ secrets.EC2_KEY_NAME }}" \
-          -var="github_repo=${{ secrets.GITHUBREPO }}"
 
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve \
           -var="key_name=${{ secrets.EC2_KEY_NAME }}" \
-          -var="github_repo=${{ secrets.GITHUBREPO }}"
